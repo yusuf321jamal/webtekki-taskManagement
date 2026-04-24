@@ -280,6 +280,7 @@ const Tasks = () => {
     justifyContent: "space-between",
     flexDirection: isMobile ? "column" : "row",
     gap: isMobile ? "15px" : "0",
+    alignItems: isMobile ? "flex-start" : "center",
   };
 
   const quickStatusStyles = {
@@ -652,15 +653,44 @@ const Tasks = () => {
             >
               <div style={taskHeaderStyles}>
                 <div style={taskContentStyles}>
-                  <h3
+                  <div
                     style={{
-                      color: "#333",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      justifyContent: "space-between",
+                      flexWrap: "wrap",
+                      gap: "10px",
                       marginBottom: "8px",
-                      fontSize: isMobile ? "18px" : "22px",
+                      flexDirection: isMobile ? "row" : "column",
                     }}
                   >
-                    {task.title}
-                  </h3>
+                    <h3
+                      style={{
+                        color: "#333",
+                        marginBottom: isMobile ? "0" : "8px",
+                        fontSize: isMobile ? "18px" : "22px",
+                        flex: isMobile ? 1 : "none",
+                      }}
+                    >
+                      {task.title}
+                    </h3>
+                    {isMobile && (
+                      <div>
+                        <span style={statusBadgeStyles(task.status)}>
+                          {task.status}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {!isMobile && (
+                    <div style={{ marginBottom: "8px" }}>
+                      <span style={statusBadgeStyles(task.status)}>
+                        {task.status}
+                      </span>
+                    </div>
+                  )}
+
                   {task.description && (
                     <p
                       style={{
@@ -716,9 +746,7 @@ const Tasks = () => {
               </div>
               <div style={statusSectionStyles}>
                 <div>
-                  <span style={statusBadgeStyles(task.status)}>
-                    {task.status}
-                  </span>
+                  <span></span>
                 </div>
                 <div style={quickStatusStyles}>
                   <label

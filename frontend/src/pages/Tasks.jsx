@@ -37,6 +37,19 @@ const Tasks = () => {
 
   const projectId = searchParams.get("projectId");
 
+  // Responsive state
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     fetchData();
   }, [projectId]);
@@ -184,10 +197,11 @@ const Tasks = () => {
     return counts;
   };
 
+  // Responsive styles
   const containerStyles = {
     maxWidth: "1200px",
     margin: "0 auto",
-    padding: "20px",
+    padding: isMobile ? "15px" : "20px",
     minHeight: "100vh",
     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
   };
@@ -195,7 +209,7 @@ const Tasks = () => {
   const contentStyles = {
     backgroundColor: "white",
     borderRadius: "16px",
-    padding: "30px",
+    padding: isMobile ? "20px" : "30px",
     boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
   };
 
@@ -206,18 +220,23 @@ const Tasks = () => {
     marginBottom: "30px",
     paddingBottom: "20px",
     borderBottom: "2px solid #f0f0f0",
+    flexDirection: isMobile ? "column" : "row",
+    alignItems: isMobile ? "flex-start" : "center",
+    gap: isMobile ? "15px" : "0",
   };
 
   const statsContainerStyles = {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-    gap: "20px",
+    gridTemplateColumns: isMobile
+      ? "1fr"
+      : "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: isMobile ? "15px" : "20px",
     marginBottom: "30px",
   };
 
   const statCardStyles = {
     textAlign: "center",
-    padding: "20px",
+    padding: isMobile ? "16px" : "20px",
     borderRadius: "12px",
     backgroundColor: "#f8f9fa",
     border: "1px solid #eef2f6",
@@ -226,7 +245,7 @@ const Tasks = () => {
   const taskCardStyles = {
     backgroundColor: "#ffffff",
     borderRadius: "12px",
-    padding: "20px",
+    padding: isMobile ? "16px" : "20px",
     marginBottom: "16px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
     transition: "transform 0.2s, box-shadow 0.2s",
@@ -236,33 +255,66 @@ const Tasks = () => {
   const taskHeaderStyles = {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "start",
+    alignItems: "flex-start",
     marginBottom: "10px",
+    flexDirection: isMobile ? "column" : "row",
+    gap: isMobile ? "15px" : "0",
+  };
+
+  const taskButtonsStyles = {
+    display: "flex",
+    gap: "10px",
+    flexDirection: isMobile ? "column" : "row",
+    width: isMobile ? "100%" : "auto",
+  };
+
+  const taskContentStyles = {
+    flex: 1,
+    width: isMobile ? "100%" : "auto",
+  };
+
+  const statusSectionStyles = {
+    marginTop: "15px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexDirection: isMobile ? "column" : "row",
+    gap: isMobile ? "15px" : "0",
+  };
+
+  const quickStatusStyles = {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    flexWrap: "wrap",
+    width: isMobile ? "100%" : "auto",
+    justifyContent: isMobile ? "space-between" : "flex-start",
   };
 
   const statusBadgeStyles = (status) => ({
     display: "inline-block",
-    padding: "4px 12px",
+    padding: isMobile ? "6px 16px" : "4px 12px",
     borderRadius: "20px",
     backgroundColor: getStatusColor(status),
     color: "white",
-    fontSize: "12px",
+    fontSize: isMobile ? "13px" : "12px",
     fontWeight: "500",
   });
 
   const selectStyles = {
-    padding: "8px 12px",
+    padding: isMobile ? "10px 12px" : "8px 12px",
     borderRadius: "8px",
     border: "1px solid #ddd",
-    marginLeft: "10px",
+    marginLeft: isMobile ? "0" : "10px",
     cursor: "pointer",
     backgroundColor: "white",
+    width: isMobile ? "auto" : "auto",
   };
 
   const formContainerStyles = {
     backgroundColor: "#f8f9fa",
     borderRadius: "12px",
-    padding: "24px",
+    padding: isMobile ? "16px" : "24px",
     marginBottom: "24px",
     border: "1px solid #eef2f6",
   };
@@ -270,12 +322,25 @@ const Tasks = () => {
   const backButtonStyles = {
     background: "none",
     border: "none",
-    fontSize: "16px",
+    fontSize: isMobile ? "14px" : "16px",
     cursor: "pointer",
     color: "#667eea",
-    padding: "8px 16px",
+    padding: isMobile ? "6px 12px" : "8px 16px",
     borderRadius: "8px",
     transition: "background 0.2s",
+    width: isMobile ? "100%" : "auto",
+  };
+
+  const emptyStateStyles = {
+    textAlign: "center",
+    padding: isMobile ? "40px 15px" : "60px 20px",
+    backgroundColor: "#f8f9fa",
+    borderRadius: "12px",
+  };
+
+  const statNumberStyles = {
+    fontSize: isMobile ? "28px" : "32px",
+    marginBottom: "8px",
   };
 
   const statusCounts = getStatusCount();
@@ -286,7 +351,7 @@ const Tasks = () => {
     <div style={containerStyles}>
       <div style={contentStyles}>
         <div style={headerStyles}>
-          <div>
+          <div style={{ width: isMobile ? "100%" : "auto" }}>
             <button
               onClick={() => navigate("/dashboard")}
               style={backButtonStyles}
@@ -298,12 +363,19 @@ const Tasks = () => {
               ← Back to Dashboard
             </button>
             <h1
-              style={{ color: "#333", marginTop: "16px", marginBottom: "8px" }}
+              style={{
+                color: "#333",
+                marginTop: isMobile ? "12px" : "16px",
+                marginBottom: "8px",
+                fontSize: isMobile ? "24px" : "32px",
+              }}
             >
               Tasks
             </h1>
             {projectId && (
-              <p style={{ color: "#666" }}>
+              <p
+                style={{ color: "#666", fontSize: isMobile ? "14px" : "16px" }}
+              >
                 Project: {projects.find((p) => p._id === projectId)?.name}
               </p>
             )}
@@ -315,37 +387,19 @@ const Tasks = () => {
         {/* Status Statistics */}
         <div style={statsContainerStyles}>
           <div style={statCardStyles}>
-            <h3
-              style={{
-                fontSize: "28px",
-                color: "#ffc107",
-                marginBottom: "8px",
-              }}
-            >
+            <h3 style={{ ...statNumberStyles, color: "#ffc107" }}>
               {statusCounts.Todo}
             </h3>
             <p style={{ color: "#666" }}>Todo</p>
           </div>
           <div style={statCardStyles}>
-            <h3
-              style={{
-                fontSize: "28px",
-                color: "#17a2b8",
-                marginBottom: "8px",
-              }}
-            >
+            <h3 style={{ ...statNumberStyles, color: "#17a2b8" }}>
               {statusCounts["In Progress"]}
             </h3>
             <p style={{ color: "#666" }}>In Progress</p>
           </div>
           <div style={statCardStyles}>
-            <h3
-              style={{
-                fontSize: "28px",
-                color: "#28a745",
-                marginBottom: "8px",
-              }}
-            >
+            <h3 style={{ ...statNumberStyles, color: "#28a745" }}>
               {statusCounts.Done}
             </h3>
             <p style={{ color: "#666" }}>Done</p>
@@ -353,14 +407,23 @@ const Tasks = () => {
         </div>
 
         <div style={{ marginBottom: "24px" }}>
-          <Button onClick={() => setShowForm(!showForm)}>
+          <Button
+            onClick={() => setShowForm(!showForm)}
+            style={isMobile ? { width: "100%" } : {}}
+          >
             {showForm ? "Cancel" : "+ Create New Task"}
           </Button>
         </div>
 
         {showForm && (
           <div style={formContainerStyles}>
-            <h3 style={{ marginBottom: "20px", color: "#333" }}>
+            <h3
+              style={{
+                marginBottom: "20px",
+                color: "#333",
+                fontSize: isMobile ? "20px" : "24px",
+              }}
+            >
               Create New Task
             </h3>
             <form onSubmit={handleCreateTask}>
@@ -402,9 +465,10 @@ const Tasks = () => {
                   }
                   style={{
                     width: "100%",
-                    padding: "10px",
+                    padding: isMobile ? "12px" : "10px",
                     borderRadius: "8px",
                     border: "1px solid #ddd",
+                    fontSize: isMobile ? "16px" : "14px",
                   }}
                   required
                 >
@@ -435,9 +499,10 @@ const Tasks = () => {
                   }
                   style={{
                     width: "100%",
-                    padding: "10px",
+                    padding: isMobile ? "12px" : "10px",
                     borderRadius: "8px",
                     border: "1px solid #ddd",
+                    fontSize: isMobile ? "16px" : "14px",
                   }}
                 >
                   <option value="Todo">Todo</option>
@@ -446,7 +511,11 @@ const Tasks = () => {
                 </select>
               </div>
 
-              <Button type="submit" loading={submitting}>
+              <Button
+                type="submit"
+                loading={submitting}
+                style={isMobile ? { width: "100%" } : {}}
+              >
                 Create Task
               </Button>
             </form>
@@ -455,7 +524,15 @@ const Tasks = () => {
 
         {editingTask && (
           <div style={formContainerStyles}>
-            <h3 style={{ marginBottom: "20px", color: "#333" }}>Edit Task</h3>
+            <h3
+              style={{
+                marginBottom: "20px",
+                color: "#333",
+                fontSize: isMobile ? "20px" : "24px",
+              }}
+            >
+              Edit Task
+            </h3>
             <form onSubmit={handleUpdateTask}>
               <Input
                 label="Task Title"
@@ -498,9 +575,10 @@ const Tasks = () => {
                   }
                   style={{
                     width: "100%",
-                    padding: "10px",
+                    padding: isMobile ? "12px" : "10px",
                     borderRadius: "8px",
                     border: "1px solid #ddd",
+                    fontSize: isMobile ? "16px" : "14px",
                   }}
                 >
                   <option value="Todo">Todo</option>
@@ -509,14 +587,25 @@ const Tasks = () => {
                 </select>
               </div>
 
-              <div style={{ display: "flex", gap: "10px" }}>
-                <Button type="submit" loading={submitting}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  flexDirection: isMobile ? "column" : "row",
+                }}
+              >
+                <Button
+                  type="submit"
+                  loading={submitting}
+                  style={isMobile ? { width: "100%" } : {}}
+                >
                   Update Task
                 </Button>
                 <Button
                   type="button"
                   onClick={() => setEditingTask(null)}
                   variant="secondary"
+                  style={isMobile ? { width: "100%" } : {}}
                 >
                   Cancel
                 </Button>
@@ -525,20 +614,27 @@ const Tasks = () => {
           </div>
         )}
 
-        <h2 style={{ marginBottom: "20px", color: "#333" }}>All Tasks</h2>
+        <h2
+          style={{
+            marginBottom: "20px",
+            color: "#333",
+            fontSize: isMobile ? "20px" : "28px",
+          }}
+        >
+          All Tasks
+        </h2>
+
         {tasks.length === 0 ? (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "60px 20px",
-              backgroundColor: "#f8f9fa",
-              borderRadius: "12px",
-            }}
-          >
+          <div style={emptyStateStyles}>
             <p style={{ color: "#666", marginBottom: "16px" }}>
               No tasks yet. Create your first task!
             </p>
-            <Button onClick={() => setShowForm(true)}>Create Task</Button>
+            <Button
+              onClick={() => setShowForm(true)}
+              style={isMobile ? { width: "100%" } : {}}
+            >
+              Create Task
+            </Button>
           </div>
         ) : (
           tasks.map((task) => (
@@ -555,24 +651,46 @@ const Tasks = () => {
               }}
             >
               <div style={taskHeaderStyles}>
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ color: "#333", marginBottom: "8px" }}>
+                <div style={taskContentStyles}>
+                  <h3
+                    style={{
+                      color: "#333",
+                      marginBottom: "8px",
+                      fontSize: isMobile ? "18px" : "22px",
+                    }}
+                  >
                     {task.title}
                   </h3>
                   {task.description && (
-                    <p style={{ color: "#666", marginBottom: "8px" }}>
+                    <p
+                      style={{
+                        color: "#666",
+                        marginBottom: "8px",
+                        fontSize: isMobile ? "14px" : "16px",
+                      }}
+                    >
                       {task.description}
                     </p>
                   )}
-                  <small style={{ color: "#999" }}>
+                  <small
+                    style={{
+                      color: "#999",
+                      fontSize: isMobile ? "11px" : "12px",
+                    }}
+                  >
                     Project: {task.project?.name}
                   </small>
                   <br />
-                  <small style={{ color: "#999" }}>
+                  <small
+                    style={{
+                      color: "#999",
+                      fontSize: isMobile ? "11px" : "12px",
+                    }}
+                  >
                     Created: {new Date(task.createdAt).toLocaleDateString()}
                   </small>
                 </div>
-                <div style={{ display: "flex", gap: "10px" }}>
+                <div style={taskButtonsStyles}>
                   <Button
                     onClick={() => {
                       setEditingTask(task);
@@ -583,35 +701,30 @@ const Tasks = () => {
                       });
                     }}
                     variant="secondary"
+                    style={isMobile ? { width: "100%", padding: "12px" } : {}}
                   >
                     Edit
                   </Button>
                   <Button
                     onClick={() => confirmDelete(task._id, task.title)}
                     variant="danger"
+                    style={isMobile ? { width: "100%", padding: "12px" } : {}}
                   >
                     Delete
                   </Button>
                 </div>
               </div>
-              <div
-                style={{
-                  marginTop: "15px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
+              <div style={statusSectionStyles}>
                 <div>
                   <span style={statusBadgeStyles(task.status)}>
                     {task.status}
                   </span>
                 </div>
-                <div>
+                <div style={quickStatusStyles}>
                   <label
                     style={{
-                      marginRight: "10px",
-                      fontSize: "14px",
+                      marginRight: isMobile ? "0" : "10px",
+                      fontSize: isMobile ? "14px" : "14px",
                       color: "#666",
                     }}
                   >

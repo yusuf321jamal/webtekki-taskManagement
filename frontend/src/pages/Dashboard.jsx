@@ -131,10 +131,25 @@ const Dashboard = () => {
     navigate("/login");
   };
 
+  // Function to determine if device is mobile (only for phones, not tablets)
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Mobile devices: screen width <= 480px (Mobile S, M, L)
+      // Tablets and laptops: screen width > 480px remain horizontal
+      setIsMobile(window.innerWidth <= 480);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const containerStyles = {
     maxWidth: "1200px",
     margin: "0 auto",
-    padding: "20px",
+    padding: isMobile ? "15px" : "20px",
     minHeight: "100vh",
     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
   };
@@ -142,7 +157,7 @@ const Dashboard = () => {
   const contentStyles = {
     backgroundColor: "white",
     borderRadius: "16px",
-    padding: "30px",
+    padding: isMobile ? "20px" : "30px",
     boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
   };
 
@@ -153,52 +168,87 @@ const Dashboard = () => {
     marginBottom: "30px",
     paddingBottom: "20px",
     borderBottom: "2px solid #f0f0f0",
+    flexDirection: isMobile ? "column" : "row",
+    alignItems: isMobile ? "flex-start" : "center",
+    gap: isMobile ? "15px" : "0",
   };
 
   const projectCardStyles = {
     backgroundColor: "#ffffff",
     borderRadius: "12px",
-    padding: "20px",
+    padding: isMobile ? "16px" : "20px",
     marginBottom: "16px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: isMobile ? "flex-start" : "center",
     transition: "transform 0.2s, box-shadow 0.2s",
     cursor: "pointer",
     border: "1px solid #eef2f6",
+    flexDirection: isMobile ? "column" : "row",
+    gap: isMobile ? "15px" : "0",
   };
 
   const projectInfoStyles = {
     flex: 1,
+    width: isMobile ? "100%" : "auto",
   };
 
   const buttonGroupStyles = {
     display: "flex",
     gap: "10px",
+    // ONLY on mobile (<=480px) - vertical layout
+    flexDirection: isMobile ? "column" : "row",
+    width: isMobile ? "100%" : "auto",
   };
 
   const formContainerStyles = {
     backgroundColor: "#f8f9fa",
     borderRadius: "12px",
-    padding: "24px",
+    padding: isMobile ? "16px" : "24px",
     marginBottom: "24px",
     border: "1px solid #eef2f6",
   };
 
   const statsCardStyles = {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: "20px",
+    gridTemplateColumns: isMobile
+      ? "1fr"
+      : "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: isMobile ? "15px" : "20px",
     marginBottom: "30px",
   };
 
   const statItemStyles = {
     backgroundColor: "#f8f9fa",
-    padding: "20px",
+    padding: isMobile ? "16px" : "20px",
     borderRadius: "12px",
     textAlign: "center",
     border: "1px solid #eef2f6",
+  };
+
+  const titleStyles = {
+    color: "#333",
+    marginBottom: "8px",
+    fontSize: isMobile ? "24px" : "32px",
+  };
+
+  const subtitleStyles = {
+    color: "#666",
+    fontSize: isMobile ? "14px" : "16px",
+  };
+
+  const sectionTitleStyles = {
+    marginBottom: "20px",
+    color: "#333",
+    fontSize: isMobile ? "20px" : "28px",
+  };
+
+  const emptyStateStyles = {
+    textAlign: "center",
+    padding: isMobile ? "40px 15px" : "60px 20px",
+    backgroundColor: "#f8f9fa",
+    borderRadius: "12px",
   };
 
   if (loading) return <LoadingSpinner />;
@@ -208,8 +258,8 @@ const Dashboard = () => {
       <div style={contentStyles}>
         <div style={headerStyles}>
           <div>
-            <h1 style={{ color: "#333", marginBottom: "8px" }}>Dashboard</h1>
-            <p style={{ color: "#666" }}>Welcome back, {user?.name}! 👋</p>
+            <h1 style={titleStyles}>Dashboard</h1>
+            <p style={subtitleStyles}>Welcome back, {user?.name}! 👋</p>
           </div>
           <Button onClick={handleLogout} variant="secondary">
             Logout
@@ -223,7 +273,7 @@ const Dashboard = () => {
           <div style={statItemStyles}>
             <h3
               style={{
-                fontSize: "32px",
+                fontSize: isMobile ? "28px" : "32px",
                 color: "#667eea",
                 marginBottom: "8px",
               }}
@@ -235,7 +285,7 @@ const Dashboard = () => {
           <div style={statItemStyles}>
             <h3
               style={{
-                fontSize: "32px",
+                fontSize: isMobile ? "28px" : "32px",
                 color: "#28a745",
                 marginBottom: "8px",
               }}
@@ -247,7 +297,10 @@ const Dashboard = () => {
         </div>
 
         <div style={{ marginBottom: "24px" }}>
-          <Button onClick={() => setShowForm(!showForm)}>
+          <Button
+            onClick={() => setShowForm(!showForm)}
+            style={isMobile ? { width: "100%" } : {}}
+          >
             {showForm ? "Cancel" : "+ Create New Project"}
           </Button>
         </div>
@@ -277,7 +330,11 @@ const Dashboard = () => {
                 }
                 placeholder="Enter project description"
               />
-              <Button type="submit" loading={submitting}>
+              <Button
+                type="submit"
+                loading={submitting}
+                style={isMobile ? { width: "100%" } : {}}
+              >
                 Create Project
               </Button>
             </form>
@@ -312,14 +369,25 @@ const Dashboard = () => {
                 }
                 placeholder="Enter project description"
               />
-              <div style={{ display: "flex", gap: "10px" }}>
-                <Button type="submit" loading={submitting}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  flexDirection: isMobile ? "column" : "row",
+                }}
+              >
+                <Button
+                  type="submit"
+                  loading={submitting}
+                  style={isMobile ? { width: "100%" } : {}}
+                >
                   Update Project
                 </Button>
                 <Button
                   type="button"
                   onClick={() => setEditingProject(null)}
                   variant="secondary"
+                  style={isMobile ? { width: "100%" } : {}}
                 >
                   Cancel
                 </Button>
@@ -328,20 +396,18 @@ const Dashboard = () => {
           </div>
         )}
 
-        <h2 style={{ marginBottom: "20px", color: "#333" }}>Your Projects</h2>
+        <h2 style={sectionTitleStyles}>Your Projects</h2>
         {projects.length === 0 ? (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "60px 20px",
-              backgroundColor: "#f8f9fa",
-              borderRadius: "12px",
-            }}
-          >
+          <div style={emptyStateStyles}>
             <p style={{ color: "#666", marginBottom: "16px" }}>
               No projects yet. Create your first project!
             </p>
-            <Button onClick={() => setShowForm(true)}>Create Project</Button>
+            <Button
+              onClick={() => setShowForm(true)}
+              style={isMobile ? { width: "100%" } : {}}
+            >
+              Create Project
+            </Button>
           </div>
         ) : (
           projects.map((project) => (
@@ -358,11 +424,23 @@ const Dashboard = () => {
               }}
             >
               <div style={projectInfoStyles}>
-                <h3 style={{ color: "#333", marginBottom: "8px" }}>
+                <h3
+                  style={{
+                    color: "#333",
+                    marginBottom: "8px",
+                    fontSize: isMobile ? "18px" : "22px",
+                  }}
+                >
                   {project.name}
                 </h3>
                 {project.description && (
-                  <p style={{ color: "#666", marginBottom: "8px" }}>
+                  <p
+                    style={{
+                      color: "#666",
+                      marginBottom: "8px",
+                      fontSize: isMobile ? "12px" : "14px",
+                    }}
+                  >
                     {project.description}
                   </p>
                 )}
@@ -374,6 +452,7 @@ const Dashboard = () => {
                 <Button
                   onClick={() => viewTasks(project._id)}
                   variant="primary"
+                  style={isMobile ? { width: "100%", padding: "12px" } : {}}
                 >
                   View Tasks
                 </Button>
@@ -386,12 +465,14 @@ const Dashboard = () => {
                     });
                   }}
                   variant="secondary"
+                  style={isMobile ? { width: "100%", padding: "12px" } : {}}
                 >
                   Edit
                 </Button>
                 <Button
                   onClick={() => confirmDelete(project._id, project.name)}
                   variant="danger"
+                  style={isMobile ? { width: "100%", padding: "12px" } : {}}
                 >
                   Delete
                 </Button>

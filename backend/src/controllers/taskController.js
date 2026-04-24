@@ -56,6 +56,42 @@ const createTask = async (req, res) => {
   }
 };
 
+// FULL TASK UPDATE - Updates title, description, and status
+const updateTask = async (req, res) => {
+  try {
+    const { title, description, status } = req.body;
+
+    const task = await Task.findById(req.params.id);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    if (task.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    // Update all fields
+    if (title !== undefined) task.title = title;
+    if (description !== undefined) task.description = description;
+    if (status && ["Todo", "In Progress", "Done"].includes(status)) {
+      task.status = status;
+    }
+
+    task.updatedAt = Date.now();
+    const updatedTask = await task.save();
+
+    const populatedTask = await Task.findById(updatedTask._id).populate(
+      "project",
+      "name",
+    );
+    res.json(populatedTask);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// STATUS ONLY UPDATE
 const updateTaskStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -107,4 +143,10 @@ const deleteTask = async (req, res) => {
   }
 };
 
-module.exports = { getTasks, createTask, updateTaskStatus, deleteTask };
+module.exports = {
+  getTasks,
+  createTask,
+  updateTask,
+  updateTaskStatus,
+  deleteTask,
+};

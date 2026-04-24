@@ -124,18 +124,16 @@ const Tasks = () => {
 
     setSubmitting(true);
     try {
-      await api.put(`/tasks/${editingTask._id}`, {
-        status: editFormData.status,
-      });
-      const updatedTask = {
-        ...editingTask,
+      // Send ALL updated fields to backend
+      const response = await api.put(`/tasks/${editingTask._id}`, {
         title: editFormData.title,
         description: editFormData.description,
         status: editFormData.status,
-      };
+      });
+
       setTasks(
         tasks.map((task) =>
-          task._id === editingTask._id ? updatedTask : task,
+          task._id === editingTask._id ? response.data : task,
         ),
       );
       setEditingTask(null);

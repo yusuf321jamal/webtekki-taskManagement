@@ -4,6 +4,7 @@ const { protect } = require("../middleware/authMiddleware");
 const {
   getTasks,
   createTask,
+  updateTask, // ← ADD THIS - Full task update
   updateTaskStatus,
   deleteTask,
 } = require("../controllers/taskController");
@@ -35,16 +36,13 @@ router
     createTask,
   );
 
+// FULL TASK UPDATE ROUTE (title, description, status)
 router
   .route("/:id")
-  .put(
-    [
-      body("status")
-        .isIn(["Todo", "In Progress", "Done"])
-        .withMessage("Invalid status"),
-    ],
-    updateTaskStatus,
-  )
+  .put(updateTask) // ← CHANGE THIS - Use updateTask instead of updateTaskStatus
   .delete(deleteTask);
+
+// Optional: Keep status-only update as a separate route
+router.route("/:id/status").patch(updateTaskStatus);
 
 module.exports = router;
